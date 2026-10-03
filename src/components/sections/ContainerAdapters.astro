@@ -1,0 +1,48 @@
+---
+// Container adapters: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import Callout from "../ui/Callout.astro";
+import CodePair from "../ui/CodePair.astro";
+import HeapVisualizer from "../visualizers/HeapVisualizer.tsx";
+import QueueVisualizer from "../visualizers/QueueVisualizer.tsx";
+import StackVisualizer from "../visualizers/StackVisualizer.tsx";
+---
+
+<Topic id="stack" eyebrow="Container adapter · LIFO">
+  <Fragment slot="title"><span class="ns">std::</span>stack</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;stack&gt;</code><span class="chip">push / pop / top <b>O(1)</b></span><span class="chip">built on <b>deque</b></span></div>
+  <div class="prose">
+    <p>Last in, first out. You only touch the top: <code>push</code> puts an element on top, <code>top()</code> reads it, <code>pop()</code> removes it. There is no iteration and no indexing, so to print a stack you pop it until <code>empty()</code>.</p>
+    <p>The example pushes 5, 8, 6, 3 and prints <code>3 6 8 5</code>. Run the while loop below to see why the order flips.</p>
+  </div>
+  <StackVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="stack" />
+  <Callout title="Undefined behavior" danger>Calling <code>top()</code> or <code>pop()</code> on an empty stack is not a guaranteed runtime error. It may crash, print garbage, or appear to work and break later. Check <code>!st.empty()</code> first. The button above shows what would happen.</Callout>
+  <ul class="notes"><li>Real uses: undo history, matching brackets in <code>"(a[b]&#123;c&#125;)"</code>, depth-first search without recursion.</li></ul>
+</Topic>
+
+<Topic id="queue" eyebrow="Container adapter · FIFO">
+  <Fragment slot="title"><span class="ns">std::</span>queue</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;queue&gt;</code><span class="chip">push / pop / front / back <b>O(1)</b></span></div>
+  <div class="prose">
+    <p>First in, first out, like a line at a ticket counter. <code>push</code> joins at the back, <code>pop</code> leaves from the front. <code>front()</code> and <code>back()</code> read the two ends.</p>
+  </div>
+  <QueueVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="queue" />
+  <ul class="notes"><li>Breadth-first search uses a queue: visit a node, push its neighbours, pop the next node. The shortest path in an unweighted grid falls out of that order.</li></ul>
+</Topic>
+
+<Topic id="pq" eyebrow="Container adapter · binary heap">
+  <Fragment slot="title"><span class="ns">std::</span>priority_queue</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;queue&gt;</code><span class="chip">top <b>O(1)</b></span><span class="chip">push / pop <b>O(log n)</b></span></div>
+  <div class="prose">
+    <p>A priority_queue is a binary heap stored inside a vector. Index <code>i</code> has children at <code>2i+1</code> and <code>2i+2</code>. In a max-heap every parent is at least as large as its children, so the maximum always sits at index 0.</p>
+    <p><b>push</b> adds the value at the end and swaps it upward while it beats its parent. <b>pop</b> moves the last element to the root and swaps it downward. Each move climbs one level, and a heap of n elements has about log₂ n levels. With 1,000,000 elements that is 20 swaps at most.</p>
+  </div>
+  <HeapVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="pq" />
+  <ul class="notes">
+    <li><code>greater&lt;int&gt;</code> flips the order and makes a min-heap. You must also pass the underlying container, hence <code>priority_queue&lt;int, vector&lt;int&gt;, greater&lt;int&gt;&gt;</code>.</li>
+    <li>Dijkstra's shortest path uses a min-heap of <code>pair&lt;dist, node&gt;</code>.</li>
+  </ul>
+</Topic>

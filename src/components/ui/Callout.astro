@@ -1,0 +1,11 @@
+---
+interface Props {
+  title: string;
+  /** Red "undefined behavior" style instead of the default amber note. */
+  danger?: boolean;
+}
+
+const { title, danger = false } = Astro.props;
+---
+
+<div class:list={["callout", { danger }]}><strong>{title}</strong><slot /></div>

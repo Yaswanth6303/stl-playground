@@ -1,0 +1,77 @@
+---
+/**
+ * A topic's C++ snippet next to the output it printed. Highlighting happens at build time;
+ * the only client code is the small Copy / "Try it" handler below, shared by every block.
+ */
+import snippets from "../../data/snippets.json";
+import { highlight } from "../../lib/highlight";
+
+interface Props {
+  /** Snippet key, the same as the topic id. */
+  snip: string;
+}
+
+const { snip } = Astro.props;
+const code = (snippets.code as Record<string, string>)[snip];
+const out = (snippets.out as Record<string, string>)[snip];
+if (code == null || out == null) throw new Error(`No snippet "${snip}" in snippets.json`);
+---
+
+<div class="codepair" data-snip={snip}>
+  <div class="codebox">
+    <div class="hd">
+      <span>C++ · {snip}.cpp</span><span class="acts"
+        ><button type="button" class="try" data-try={snip} aria-label={`Try ${snip}.cpp in the code editor`}>▶ Try it</button
+        ><button type="button" class="cp" aria-label={`Copy ${snip}.cpp`}>Copy</button></span
+      >
+    </div>
+    <pre><code set:html={highlight(code)} /></pre>
+  </div>
+  <div class="codebox out">
+    <div class="hd"><span><i class="dot"></i>Output · g++ 13.3 -std=c++17</span></div>
+    <pre>{out}</pre>
+  </div>
+</div>
+
+<script>
+  import { RM } from "../../lib/motion";
+  import { TRY_EVENT } from "../../lib/visited";
+
+  document.addEventListener("click", (e) => {
+    const target = e.target as Element | null;
+
+    const cp = target?.closest<HTMLButtonElement>(".codepair button.cp");
+    if (cp) {
+      const pre = cp.closest(".codebox")?.querySelector("pre");
+      if (!pre) return;
+      const text = pre.textContent ?? "";
+      const done = () => {
+        cp.textContent = "Copied";
+        setTimeout(() => (cp.textContent = "Copy"), 1400);
+      };
+      const fallback = () => {
+        const r = document.createRange();
+        r.selectNodeContents(pre);
+        const s = getSelection();
+        s?.removeAllRanges();
+        s?.addRange(r);
+        cp.textContent = "Selected, press Ctrl+C";
+        setTimeout(() => (cp.textContent = "Copy"), 2200);
+      };
+      try {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } catch {
+        fallback();
+      }
+      return;
+    }
+
+    const tryBtn = target?.closest<HTMLElement>("[data-try]");
+    if (tryBtn?.dataset.try) {
+      // The editor island picks this up when it hydrates, or right away through the event.
+      window.__stlPendingTry = tryBtn.dataset.try;
+      document.dispatchEvent(new CustomEvent(TRY_EVENT, { detail: tryBtn.dataset.try }));
+      document.getElementById("editor")?.scrollIntoView({ behavior: RM ? "auto" : "smooth", block: "start" });
+    }
+  });
+</script>

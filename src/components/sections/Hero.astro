@@ -1,0 +1,31 @@
+---
+import Hero3D from "../islands/Hero3D.tsx";
+---
+
+<section class="hero">
+  <div class="row g-4 align-items-center">
+    <div class="col-xl-6">
+      <div class="eyebrow">C++ Standard Template Library</div>
+      <h1>Watch <span class="mono">vector</span>, <span class="mono">map</span> and <span class="mono">sort</span> move.</h1>
+      <p class="sub">
+        Every container and algorithm on this page runs live in your browser. Click an operation, watch the elements shift, then read the real C++ next to its real output. All code was compiled and run with g++ 13.3 using <code>-std=c++17</code>.
+      </p>
+      <div class="ctas">
+        <a class="cta primary" href="#vector">Start with vector</a>
+        <a class="cta" href="#editor">Open the code editor</a>
+        <a class="cta" href="#cheatsheet">Complexity cheat sheet</a>
+        <a class="cta" href="#mistakes">Common mistakes</a>
+      </div>
+      <div class="legend">
+        <span><i class="sw"></i> element</span>
+        <span><i class="sw it"></i> iterator / touched</span>
+        <span><i class="sw gh"></i> empty slot or end()</span>
+        <span><i class="sw bd"></i> error / undefined behavior</span>
+      </div>
+    </div>
+    <div class="col-xl-6">
+      <!-- Above the fold, so it hydrates on load rather than on visibility. -->
+      <Hero3D client:load />
+    </div>
+  </div>
+</section>

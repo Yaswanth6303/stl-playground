@@ -1,0 +1,22 @@
+---
+/**
+ * One page section. Its id is the URL hash; group and name come from the topic registry
+ * so the sidebar, the visit counter and the editor's example list stay in sync.
+ */
+import { topic } from "../../lib/topics";
+
+interface Props {
+  id: string;
+  /** Small uppercase line above the heading, e.g. "Basics · <cmath>". */
+  eyebrow: string;
+}
+
+const { id, eyebrow } = Astro.props;
+const { group, name } = topic(id);
+---
+
+<section class="topic" id={id} data-group={group} data-name={name}>
+  <div class="eyebrow">{eyebrow}</div>
+  <h2><slot name="title" /></h2>
+  <slot />
+</section>

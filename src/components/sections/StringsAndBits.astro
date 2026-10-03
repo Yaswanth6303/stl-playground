@@ -1,0 +1,35 @@
+---
+// Strings & bits: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import BitsetVisualizer from "../visualizers/BitsetVisualizer.tsx";
+import Callout from "../ui/Callout.astro";
+import CodePair from "../ui/CodePair.astro";
+import StringVisualizer from "../visualizers/StringVisualizer.tsx";
+---
+
+<Topic id="string" eyebrow="Strings & bits · a container of chars">
+  <Fragment slot="title"><span class="ns">std::</span>string</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;string&gt;</code><span class="chip">s[i] <b>O(1)</b></span><span class="chip">find / substr <b>O(n)</b></span></div>
+  <div class="prose">
+    <p>A string behaves like a <code>vector&lt;char&gt;</code> with text tools on top. <code>push_back</code>, <code>size</code>, iterators, <code>sort</code> and <code>reverse</code> all work.</p>
+    <p>Watch the arguments. <code>substr(start, length)</code> takes a <b>length</b>, not an end index, so <code>s.substr(0, 5)</code> gives 5 characters. <code>find</code> returns the index of the first match, or <code>string::npos</code> when there is none.</p>
+  </div>
+  <StringVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="string" />
+  <Callout title="npos is not -1 you can compare to int"><code>string::npos</code> is the largest <code>size_t</code> value. Write <code>if (s.find(x) == string::npos)</code>. Storing the result in an <code>int</code> and checking <code>&lt; 0</code> is fragile and warns on most compilers.</Callout>
+</Topic>
+
+<Topic id="bitset" eyebrow="Strings & bits · fixed number of bits">
+  <Fragment slot="title"><span class="ns">std::</span>bitset</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;bitset&gt;</code><span class="chip">set / test <b>O(1)</b></span><span class="chip">count <b>O(N/64)</b></span></div>
+  <div class="prose">
+    <p><code>bitset&lt;8&gt;</code> stores 8 on/off flags packed into one byte. Bit 0 is the rightmost when printed. <code>set(i)</code> turns bit i on, <code>reset(i)</code> turns it off, <code>flip(i)</code> toggles it, and <code>count()</code> tells you how many are on.</p>
+    <p>Click any bit below to flip it and watch the decimal value change.</p>
+  </div>
+  <BitsetVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="bitset" />
+  <ul class="notes">
+    <li>A <code>bitset&lt;1000000&gt;</code> takes 125 KB. A <code>vector&lt;bool&gt;</code> of the same size is similar, a <code>vector&lt;int&gt;</code> takes 4 MB.</li>
+    <li>The size must be a compile-time constant. For a size known only at runtime, use <code>vector&lt;bool&gt;</code>.</li>
+  </ul>
+</Topic>

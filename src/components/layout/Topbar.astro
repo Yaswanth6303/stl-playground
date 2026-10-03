@@ -1,0 +1,62 @@
+---
+import { TOPICS } from "../../lib/topics";
+---
+
+<header class="topbar">
+  <div class="container-xxl inner">
+    <button class="op menu-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidenav" aria-controls="sidenav" aria-label="Open topics"
+      >☰<span class="tl"> Topics</span></button
+    >
+    <a class="brand" href="#top"><span class="mark">std::</span>STL Playground</a>
+    <span class="grow"></span>
+    <div class="theme-switch" role="group" aria-label="Colour theme">
+      <button type="button" data-t="light" aria-pressed="false" aria-label="Light theme">☀<span class="tl"> Light</span></button><button
+        type="button"
+        data-t="auto"
+        aria-pressed="true"
+        aria-label="Follow system theme">Auto</button
+      ><button type="button" data-t="dark" aria-pressed="false" aria-label="Dark theme">☾<span class="tl"> Dark</span></button>
+    </div>
+    <span class="vlabel d-none d-md-inline" id="visitCount">0 / {TOPICS.length} topics tried</span>
+  </div>
+  <div class="progress-line" id="progress"></div>
+</header>
+
+<script>
+  type Theme = "light" | "dark" | "auto";
+
+  /* theme switch: light / auto (follow the OS) / dark, remembered per browser */
+  const root = document.documentElement;
+  const btns = [...document.querySelectorAll<HTMLButtonElement>(".theme-switch button")];
+  const apply = (t: Theme, save: boolean) => {
+    if (t === "auto") root.removeAttribute("data-theme");
+    else root.setAttribute("data-theme", t);
+    btns.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.t === t)));
+    if (save) {
+      try {
+        localStorage.setItem("stl-theme", t);
+      } catch {
+        /* storage blocked */
+      }
+    }
+  };
+  let saved: string | null = null;
+  try {
+    saved = localStorage.getItem("stl-theme");
+  } catch {
+    /* storage blocked */
+  }
+  apply(saved === "light" || saved === "dark" || saved === "auto" ? saved : "auto", false);
+  btns.forEach((b) => b.addEventListener("click", () => apply(b.dataset.t as Theme, true)));
+
+  /* reading progress line under the top bar */
+  const prog = document.getElementById("progress");
+  addEventListener(
+    "scroll",
+    () => {
+      const h = document.documentElement;
+      if (prog) prog.style.width = (h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight)) * 100 + "%";
+    },
+    { passive: true },
+  );
+</script>

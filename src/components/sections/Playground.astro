@@ -1,0 +1,21 @@
+---
+// Playground: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import Callout from "../ui/Callout.astro";
+import CodeEditor from "../islands/CodeEditor.tsx";
+---
+
+<Topic id="editor" eyebrow="Playground · write and run your own C++">
+  <Fragment slot="title">code editor</Fragment>
+  <div class="chips"><span class="chip">compiler <b>GCC 13.3</b></span><span class="chip"><b>-std=c++17 -O2</b></span><span class="chip">stdin supported</span><span class="chip"><b>Ctrl + Enter</b> runs</span></div>
+  <div class="prose">
+    <p>Write any program here and run it. Start from the example below, pick one of the 37 topics from the list, or press <b>Try it</b> on any code block further down the page. Put your program's input in the stdin box, the way you would type it into a terminal.</p>
+  </div>
+  <CodeEditor client:visible={{ rootMargin: "200px" }} />
+  <Callout title="Where your code runs">Run sends your code to Compiler Explorer (godbolt.org), a free public compiler service, and shows what it prints. Don't paste passwords or private code.</Callout>
+  <ul class="notes">
+    <li>Compile errors show in red, and the matching lines are marked in the editor.</li>
+    <li>Your draft stays in this browser, so a reload won't lose it. Reset brings back the selected example.</li>
+    <li>Programs are stopped after a few seconds, so an infinite loop shows "timed out" instead of hanging.</li>
+  </ul>
+</Topic>

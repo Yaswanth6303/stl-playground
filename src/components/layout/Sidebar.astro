@@ -1,0 +1,113 @@
+---
+/** Topic navigation: Bootstrap offcanvas below lg, sticky sidebar above. */
+import { topicGroups } from "../../lib/topics";
+
+const groups = topicGroups();
+---
+
+<aside class="col-lg-3 col-xl-2">
+  <div class="side">
+    <div class="offcanvas-lg offcanvas-start" tabindex="-1" id="sidenav" aria-labelledby="sidenavLabel">
+      <div class="offcanvas-header d-lg-none">
+        <h5 class="offcanvas-title brand" id="sidenavLabel"><span class="mark">std::</span>Topics</h5>
+        <button type="button" class="op" data-bs-dismiss="offcanvas" data-bs-target="#sidenav" aria-label="Close">✕</button>
+      </div>
+      <div class="offcanvas-body flex-column">
+        <input id="navFilter" class="side-search" type="search" placeholder="Filter: map, sort…" aria-label="Filter topics" />
+        <nav class="toc" id="toc" aria-label="Topics">
+          {
+            groups.map((g) => (
+              <div class="navgroup">
+                <h6>{g.name}</h6>
+                {g.items.map((t) => (
+                  <a href={`#${t.id}`} data-id={t.id}>
+                    <span>{t.name}</span>
+                    <i class="seen" />
+                  </a>
+                ))}
+              </div>
+            ))
+          }
+        </nav>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<script>
+  // Registers Bootstrap's data-bs-toggle / data-bs-dismiss handlers for the offcanvas menu.
+  import Offcanvas from "bootstrap/js/dist/offcanvas";
+  import { RM } from "../../lib/motion";
+  import { VISIT_EVENT } from "../../lib/visited";
+
+  const toc = document.getElementById("toc") as HTMLElement;
+  const links = [...toc.querySelectorAll<HTMLAnchorElement>("a")];
+  const topics = [...document.querySelectorAll<HTMLElement>(".topic")];
+
+  /* "N / 41 topics tried" + green dot on visited links */
+  const visited = new Set<string>();
+  const counter = document.getElementById("visitCount");
+  document.addEventListener(VISIT_EVENT, (e) => {
+    const id = e.detail;
+    if (!id || visited.has(id)) return;
+    visited.add(id);
+    toc.querySelector(`[data-id="${CSS.escape(id)}"]`)?.classList.add("visited");
+    if (counter) counter.textContent = `${visited.size} / ${topics.length} topics tried`;
+  });
+
+  /* keep the active topic in view inside the sidebar, without moving the page */
+  const sideBox = document.querySelector<HTMLElement>(".side");
+  const followInSidebar = (link: HTMLElement | null) => {
+    const box = [sideBox, document.querySelector<HTMLElement>("#sidenav .offcanvas-body")].find(
+      (b): b is HTMLElement => !!b && b.scrollHeight > b.clientHeight + 2 && b.getBoundingClientRect().height > 0,
+    );
+    if (!box || !link) return;
+    const br = box.getBoundingClientRect();
+    const lr = link.getBoundingClientRect();
+    if (lr.top >= br.top + 70 && lr.bottom <= br.bottom - 70) return;
+    const target = box.scrollTop + (lr.top - br.top) - box.clientHeight / 2 + lr.height / 2;
+    box.scrollTo({ top: Math.max(0, target), behavior: RM ? "auto" : "smooth" });
+  };
+
+  /* scroll spy */
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        let active: HTMLElement | null = null;
+        links.forEach((l) => {
+          const on = l.dataset.id === e.target.id;
+          l.classList.toggle("active", on);
+          if (on) {
+            active = l;
+            l.setAttribute("aria-current", "location");
+          } else l.removeAttribute("aria-current");
+        });
+        followInSidebar(active);
+      });
+    },
+    { rootMargin: "-35% 0px -60% 0px" },
+  );
+  topics.forEach((t) => io.observe(t));
+
+  /* close the mobile menu after picking a topic */
+  toc.addEventListener("click", (e) => {
+    if (!(e.target as Element).closest("a")) return;
+    Offcanvas.getInstance("#sidenav")?.hide();
+  });
+
+  /* filter by topic or group name */
+  document.getElementById("navFilter")?.addEventListener("input", (e) => {
+    const q = (e.target as HTMLInputElement).value.trim().toLowerCase();
+    toc.querySelectorAll<HTMLElement>(".navgroup").forEach((g) => {
+      const groupName = g.querySelector("h6")?.textContent?.toLowerCase() ?? "";
+      let any = false;
+      g.querySelectorAll<HTMLAnchorElement>("a").forEach((a) => {
+        const show = !q || (a.textContent ?? "").toLowerCase().includes(q) || groupName.includes(q);
+        a.hidden = !show;
+        any = any || show;
+      });
+      g.hidden = !any;
+    });
+  });
+</script>

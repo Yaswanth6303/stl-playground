@@ -1,11 +1,46 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Topbar from "../components/layout/Topbar.astro";
+import Sidebar from "../components/layout/Sidebar.astro";
+import Footer from "../components/layout/Footer.astro";
+import Hero from "../components/sections/Hero.astro";
+import Playground from "../components/sections/Playground.astro";
+import Basics from "../components/sections/Basics.astro";
+import SequenceContainers from "../components/sections/SequenceContainers.astro";
+import StringsAndBits from "../components/sections/StringsAndBits.astro";
+import ContainerAdapters from "../components/sections/ContainerAdapters.astro";
+import OrderedAssociative from "../components/sections/OrderedAssociative.astro";
+import UnorderedAssociative from "../components/sections/UnorderedAssociative.astro";
+import Sorting from "../components/sections/Sorting.astro";
+import Searching from "../components/sections/Searching.astro";
+import Modifying from "../components/sections/Modifying.astro";
+import Numeric from "../components/sections/Numeric.astro";
+import SetAlgorithms from "../components/sections/SetAlgorithms.astro";
+import Reference from "../components/sections/Reference.astro";
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout title="C++ STL Playground" description="Interactive, animated guide to the C++ Standard Template Library.">
+  <Topbar />
+  <div class="container-xxl" id="top">
+    <div class="row">
+      <Sidebar />
+      <main class="col-lg-9 col-xl-10">
+        <Hero />
+        <Playground />
+        <Basics />
+        <SequenceContainers />
+        <StringsAndBits />
+        <ContainerAdapters />
+        <OrderedAssociative />
+        <UnorderedAssociative />
+        <Sorting />
+        <Searching />
+        <Modifying />
+        <Numeric />
+        <SetAlgorithms />
+        <Reference />
+        <Footer />
+      </main>
+    </div>
+  </div>
+</BaseLayout>

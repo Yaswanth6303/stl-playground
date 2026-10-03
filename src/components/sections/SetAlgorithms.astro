@@ -1,0 +1,18 @@
+---
+// Set algorithms: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import CodePair from "../ui/CodePair.astro";
+import SetOpsVisualizer from "../visualizers/SetOpsVisualizer.tsx";
+---
+
+<Topic id="setops" eyebrow="Set algorithms · two sorted ranges">
+  <Fragment slot="title">set_union, set_intersection, set_difference</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip"><b>O(n + m)</b></span><span class="chip">inputs must be sorted</span></div>
+  <div class="prose">
+    <p>These walk two sorted ranges with one pointer each. At every step they compare the two current values, emit something, and advance the smaller side. No hashing, no nested loops.</p>
+    <p>The output goes through an iterator. <code>back_inserter(u)</code> calls <code>u.push_back</code> for each result, so you don't need to size <code>u</code> in advance.</p>
+  </div>
+  <SetOpsVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="setops" />
+  <ul class="notes"><li>They work on vectors and on <code>set</code>s. They do not work on unordered containers, because those are not sorted.</li></ul>
+</Topic>

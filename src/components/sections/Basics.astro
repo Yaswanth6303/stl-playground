@@ -1,0 +1,67 @@
+---
+// Basics: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import Callout from "../ui/Callout.astro";
+import CodePair from "../ui/CodePair.astro";
+import IteratorsVisualizer from "../visualizers/IteratorsVisualizer.tsx";
+import PairVisualizer from "../visualizers/PairVisualizer.tsx";
+import PowVisualizer from "../visualizers/PowVisualizer.tsx";
+import TupleVisualizer from "../visualizers/TupleVisualizer.tsx";
+---
+
+<Topic id="pow" eyebrow="Basics · <cmath>">
+  <Fragment slot="title"><span class="ns">std::</span>pow</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;cmath&gt;</code><span class="chip">loop <b>O(n)</b></span><span class="chip">returns <b>double</b></span></div>
+  <div class="prose">
+    <p>Raising a number to a power. The loop multiplies <code>result</code> by 2 nine times. <code>pow(2, 9)</code> does the same work but returns a <code>double</code>, so the answer is 512.0 printed as 512.</p>
+    <p>Doubles can round. A well-known case: some older MinGW builds printed 99 for <code>(int)pow(10, 2)</code>. When you need an exact integer, use a loop, or <code>1LL &lt;&lt; n</code> for powers of two.</p>
+  </div>
+  <PowVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="pow" />
+  <ul class="notes">
+    <li>For large exponents with a modulus (common in contests), write fast exponentiation: square the base and halve the exponent each step. That runs in O(log n) instead of O(n).</li>
+    <li><code>1 &lt;&lt; 31</code> overflows a 32-bit int. Use <code>1LL &lt;&lt; 31</code>.</li>
+  </ul>
+</Topic>
+
+<Topic id="pair" eyebrow="Basics · <utility>">
+  <Fragment slot="title"><span class="ns">std::</span>pair</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;utility&gt;</code><span class="chip">access <b>O(1)</b></span></div>
+  <div class="prose">
+    <p>A pair stores two values in one variable. The two types can differ: <code>pair&lt;char, int&gt;</code> holds a letter and a number. Read them with <code>.first</code> and <code>.second</code>.</p>
+    <p>Pairs can nest. In <code>pr4</code> the first slot is itself a pair, so you reach the <code>3</code> with <code>pr4.first.first</code>. Click an expression below to see which slot it reads.</p>
+  </div>
+  <PairVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="pair" />
+  <ul class="notes">
+    <li>Pairs compare by <code>.first</code>, then by <code>.second</code>. That is why <code>sort()</code> on a vector of pairs works without a comparator.</li>
+    <li>Pairs are how <code>map</code> stores each entry: <code>it-&gt;first</code> is the key, <code>it-&gt;second</code> the value.</li>
+  </ul>
+</Topic>
+
+<Topic id="tuple" eyebrow="Basics · <tuple>">
+  <Fragment slot="title"><span class="ns">std::</span>tuple</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;tuple&gt;</code><span class="chip">get&lt;i&gt; <b>O(1)</b></span><span class="chip">i fixed at compile time</span></div>
+  <div class="prose">
+    <p>A tuple is a pair that can hold any number of values. A student record of roll number, name and grade fits in <code>tuple&lt;int, string, char&gt;</code>. Read a value with <code>get&lt;0&gt;(t)</code>, <code>get&lt;1&gt;(t)</code> and so on.</p>
+    <p>The index inside <code>&lt; &gt;</code> must be a constant. <code>get&lt;i&gt;(t)</code> with a loop variable <code>i</code> does not compile, because each slot can have a different type.</p>
+  </div>
+  <TupleVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="tuple" />
+  <ul class="notes">
+    <li>Tuples compare slot by slot, left to right. <code>sort</code> on a vector of tuples sorts by the first value, then the second, then the third.</li>
+    <li>For more than 3 or 4 fields, a small <code>struct</code> with named members reads better than <code>get&lt;3&gt;</code>.</li>
+  </ul>
+</Topic>
+
+<Topic id="iterators" eyebrow="Basics · every container">
+  <Fragment slot="title">iterators</Fragment>
+  <div class="chips"><span class="chip">begin() / end()</span><span class="chip">rbegin() / rend()</span><span class="chip">*it reads the value</span></div>
+  <div class="prose">
+    <p>An iterator marks a position inside a container. <code>it</code> is the position, <code>*it</code> is the value stored there. <code>begin()</code> points at the first element. <code>end()</code> points at the slot after the last one, so a loop runs while <code>i != end()</code>.</p>
+    <p>Reverse iterators flip the direction: <code>rbegin()</code> is the last element and <code>rend()</code> sits before the first. Step through both below. Try dereferencing <code>end()</code> to see why it is off limits.</p>
+  </div>
+  <IteratorsVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="iterators" />
+  <Callout title="Use != in loops">Comparing with <code>&lt;</code> only works for random-access iterators (vector, deque, arrays). A <code>list</code>, <code>set</code> or <code>map</code> iterator has no <code>&lt;</code>, and <code>i &lt; ls.end()</code> will not compile. <code>!=</code> works everywhere.</Callout>
+</Topic>

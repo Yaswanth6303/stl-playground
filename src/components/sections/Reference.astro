@@ -1,0 +1,63 @@
+---
+// Reference: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import MistakeList from "../ui/MistakeList.astro";
+import Quiz from "../islands/Quiz.tsx";
+---
+
+<Topic id="cheatsheet" eyebrow="Reference">
+  <Fragment slot="title">complexity cheat sheet</Fragment>
+  <div class="prose"><p>n is the number of elements. "amortized" means fast on average, with an occasional slow step (a vector reallocating). "avg" means average case for hash tables.</p></div>
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th>Container</th><th>Access i-th</th><th>Search</th><th>Insert</th><th>Erase</th><th>Ordered?</th><th>Duplicates?</th></tr></thead>
+      <tbody>
+        <tr><td>vector</td><td class="o o1">O(1)</td><td class="o on">O(n)</td><td class="o">back O(1)* · middle <span class="on">O(n)</span></td><td class="o">back O(1) · middle <span class="on">O(n)</span></td><td>insertion order</td><td>yes</td></tr>
+        <tr><td>array</td><td class="o o1">O(1)</td><td class="o on">O(n)</td><td class="o ona">fixed size</td><td class="o ona">fixed size</td><td>index order</td><td>yes</td></tr>
+        <tr><td>deque</td><td class="o o1">O(1)</td><td class="o on">O(n)</td><td class="o">ends O(1) · middle <span class="on">O(n)</span></td><td class="o">ends O(1) · middle <span class="on">O(n)</span></td><td>insertion order</td><td>yes</td></tr>
+        <tr><td>list</td><td class="o on">O(n)</td><td class="o on">O(n)</td><td class="o o1">O(1) at iterator</td><td class="o o1">O(1) at iterator</td><td>insertion order</td><td>yes</td></tr>
+        <tr><td>forward_list</td><td class="o on">O(n)</td><td class="o on">O(n)</td><td class="o o1">O(1) after iterator</td><td class="o o1">O(1) after iterator</td><td>insertion order</td><td>yes</td></tr>
+        <tr><td>string</td><td class="o o1">O(1)</td><td class="o on">find O(n·m)</td><td class="o">back O(1)* · middle <span class="on">O(n)</span></td><td class="o">back O(1) · middle <span class="on">O(n)</span></td><td>text order</td><td>yes</td></tr>
+        <tr><td>bitset&lt;N&gt;</td><td class="o o1">O(1)</td><td class="o ona">count O(N/64)</td><td class="o ona">fixed N bits</td><td class="o ona">fixed N bits</td><td>bit index</td><td>on/off</td></tr>
+        <tr><td>stack / queue</td><td class="o ona">top/front only</td><td class="o ona">no</td><td class="o o1">O(1)</td><td class="o o1">O(1)</td><td>LIFO / FIFO</td><td>yes</td></tr>
+        <tr><td>priority_queue</td><td class="o ona">top only O(1)</td><td class="o ona">no</td><td class="o olog">O(log n)</td><td class="o olog">O(log n)</td><td>max (or min) on top</td><td>yes</td></tr>
+        <tr><td>set / map</td><td class="o on">O(n)</td><td class="o olog">O(log n)</td><td class="o olog">O(log n)</td><td class="o olog">O(log n)</td><td>sorted</td><td>no</td></tr>
+        <tr><td>multiset / multimap</td><td class="o on">O(n)</td><td class="o olog">O(log n)</td><td class="o olog">O(log n)</td><td class="o olog">O(log n + k)</td><td>sorted</td><td>yes</td></tr>
+        <tr><td>unordered_set / map</td><td class="o ona">no</td><td class="o o1">O(1) avg</td><td class="o o1">O(1) avg</td><td class="o o1">O(1) avg</td><td>no order</td><td>no</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Which container should you pick?</h3>
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th>You need</th><th>Use</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>a size that never changes</td><td><code>array</code></td><td>days in each of 12 months</td></tr>
+        <tr><td>a growing list, index access</td><td><code>vector</code></td><td>marks of 60 students, read <code>marks[i]</code></td></tr>
+        <tr><td>add/remove at both ends</td><td><code>deque</code></td><td>sliding window maximum</td></tr>
+        <tr><td>undo, bracket matching</td><td><code>stack</code></td><td>is <code>"&#123;[()]&#125;"</code> balanced?</td></tr>
+        <tr><td>process in arrival order</td><td><code>queue</code></td><td>BFS on a grid, print jobs</td></tr>
+        <tr><td>always grab the largest/smallest</td><td><code>priority_queue</code></td><td>Dijkstra, top-k scores</td></tr>
+        <tr><td>unique values, sorted, range queries</td><td><code>set</code></td><td>"smallest value ≥ 50" with lower_bound</td></tr>
+        <tr><td>fast "have I seen this?"</td><td><code>unordered_set</code></td><td>duplicate detection in 10⁶ numbers</td></tr>
+        <tr><td>key → value, sorted keys</td><td><code>map</code></td><td>roll number → name, printed in order</td></tr>
+        <tr><td>key → value, just lookups</td><td><code>unordered_map</code></td><td>word frequency count</td></tr>
+        <tr><td>many on/off flags</td><td><code>bitset</code></td><td>sieve of primes up to 10⁶</td></tr>
+        <tr><td>range sums, many queries</td><td><code>partial_sum</code></td><td>sales between day l and day r</td></tr>
+        <tr><td>k-th smallest or median</td><td><code>nth_element</code></td><td>median of 10⁶ salaries</td></tr>
+      </tbody>
+    </table>
+  </div>
+</Topic>
+
+<Topic id="mistakes" eyebrow="Reference">
+  <Fragment slot="title">common mistakes</Fragment>
+  <div class="prose"><p>Each of these compiles. Most still print something. That is what makes them dangerous.</p></div>
+  <MistakeList />
+</Topic>
+
+<Topic id="quiz" eyebrow="Reference">
+  <Fragment slot="title">check yourself</Fragment>
+  <div class="prose"><p>Eleven quick questions. Each answer explains itself when you click.</p></div>
+  <Quiz client:visible={{ rootMargin: "200px" }} />
+</Topic>

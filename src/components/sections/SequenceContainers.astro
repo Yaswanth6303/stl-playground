@@ -1,0 +1,80 @@
+---
+// Sequence containers: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import ArrayVisualizer from "../visualizers/ArrayVisualizer.tsx";
+import Callout from "../ui/Callout.astro";
+import CodePair from "../ui/CodePair.astro";
+import DequeVisualizer from "../visualizers/DequeVisualizer.tsx";
+import ForwardListVisualizer from "../visualizers/ForwardListVisualizer.tsx";
+import ListVisualizer from "../visualizers/ListVisualizer.tsx";
+import VectorVisualizer from "../visualizers/VectorVisualizer.tsx";
+---
+
+<Topic id="vector" eyebrow="Sequence container · dynamic array">
+  <Fragment slot="title"><span class="ns">std::</span>vector</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;vector&gt;</code><span class="chip">v[i] <b>O(1)</b></span><span class="chip">push_back <b>O(1)</b> amortized</span><span class="chip">insert/erase front <b>O(n)</b></span></div>
+  <div class="prose">
+    <p>A vector is an array that grows. Elements sit side by side in memory, so <code>vec[i]</code> jumps straight to slot <code>i</code>.</p>
+    <p>The dashed slots are <b>capacity</b>: memory already reserved but not used yet. When <code>size == capacity</code> and you push again, the vector allocates a bigger block and copies every element over. GCC doubles the capacity each time (1, 2, 4, 8, 16), which keeps <code>push_back</code> fast on average. Push until it happens and watch the capacity counter.</p>
+  </div>
+  <VectorVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="vector" />
+  <ul class="notes">
+    <li>Know the final size? Call <code>vec.reserve(n)</code> first and skip every reallocation.</li>
+    <li><code>erase(begin())</code> shifts every remaining element left. On 1 million elements that is 1 million moves. Remove from the back when you can.</li>
+    <li><code>clear()</code> sets size to 0 but keeps the capacity. The memory stays reserved.</li>
+    <li><code>vec.at(10)</code> on a 4-element vector throws <code>std::out_of_range</code>. <code>vec[10]</code> does no check and reads whatever is in memory.</li>
+    <li>A reallocation moves the elements, so any iterator or pointer you saved into the old block is now invalid.</li>
+  </ul>
+</Topic>
+
+<Topic id="array" eyebrow="Sequence container · fixed size">
+  <Fragment slot="title"><span class="ns">std::</span>array</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;array&gt;</code><span class="chip">arr[i] <b>O(1)</b></span><span class="chip">size fixed at compile time</span></div>
+  <div class="prose">
+    <p><code>array&lt;int, 5&gt;</code> is a plain C array <code>int arr[5]</code> with container manners: it knows its <code>size()</code>, has <code>begin()</code>/<code>end()</code>, supports <code>at()</code> with bounds checking, and can be copied with <code>=</code>.</p>
+    <p>The size is part of the type, so there is no <code>push_back</code> or <code>erase</code>. Use it when the count never changes: 12 months, 26 letters, 4 directions in a grid.</p>
+  </div>
+  <ArrayVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="array" />
+  <ul class="notes"><li><code>array&lt;int, 5&gt; a;</code> inside a function leaves the values uninitialised, same as <code>int a[5];</code>. Write <code>array&lt;int, 5&gt; a&#123;&#125;;</code> to get zeros.</li></ul>
+</Topic>
+
+<Topic id="list" eyebrow="Sequence container · doubly linked list">
+  <Fragment slot="title"><span class="ns">std::</span>list</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;list&gt;</code><span class="chip">push/pop both ends <b>O(1)</b></span><span class="chip">insert at iterator <b>O(1)</b></span><span class="chip">find i-th <b>O(n)</b></span></div>
+  <div class="prose">
+    <p>Each element lives in its own node, and each node points to the node before and after it (the ⇄ arrows). Adding at the front only rewires two pointers, which is why <code>list</code> has <code>push_front</code> and <code>vector</code> does not.</p>
+    <p>The price: there is no <code>ls[3]</code>. To reach the fourth element you walk from the head, one node at a time.</p>
+  </div>
+  <ListVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="list" />
+  <ul class="notes">
+    <li>In practice a vector is often faster even for middle inserts on small data, because contiguous memory is cache friendly. Reach for <code>list</code> when you insert or splice at iterators you already hold.</li>
+    <li><code>list</code> has its own <code>ls.sort()</code>. <code>std::sort</code> needs random access and will not compile on a list.</li>
+  </ul>
+</Topic>
+
+<Topic id="flist" eyebrow="Sequence container · singly linked list">
+  <Fragment slot="title"><span class="ns">std::</span>forward_list</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;forward_list&gt;</code><span class="chip">push_front <b>O(1)</b></span><span class="chip">insert_after <b>O(1)</b></span><span class="chip">no size()</span></div>
+  <div class="prose">
+    <p>Each node points only to the next node, so it uses less memory than <code>list</code>. You can only move forward. Because a node can't see the one before it, you insert and erase <b>after</b> a position: <code>insert_after</code>, <code>erase_after</code>.</p>
+    <p>There is no <code>push_back</code> and no <code>size()</code>. Counting the nodes means walking all of them with <code>distance(fl.begin(), fl.end())</code>.</p>
+  </div>
+  <ForwardListVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="flist" />
+  <ul class="notes"><li>To insert at the very front with the "after" functions, use <code>fl.before_begin()</code>, a position that sits before the first node.</li></ul>
+</Topic>
+
+<Topic id="deque" eyebrow="Sequence container · blocks of arrays">
+  <Fragment slot="title"><span class="ns">std::</span>deque</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;deque&gt;</code><span class="chip">push/pop both ends <b>O(1)</b></span><span class="chip">dq[i] <b>O(1)</b></span></div>
+  <div class="prose">
+    <p>A deque (double-ended queue) stores elements in fixed-size blocks plus a small table that tracks the blocks. Pushing to the front fills the first block backwards. When a block is full, the deque adds a new block instead of moving everything.</p>
+    <p>You get fast pushes at both ends like a list, and <code>dq[i]</code> like a vector. Blocks of 4 below keep it readable; real GCC blocks are 512 bytes.</p>
+  </div>
+  <DequeVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="deque" />
+  <Callout title="Common mix-up"><code>vector</code> is one contiguous array. <code>list</code> is linked nodes. <code>deque</code> is a set of array blocks. A deque is not a linked list, and a list is not built on a vector.</Callout>
+</Topic>

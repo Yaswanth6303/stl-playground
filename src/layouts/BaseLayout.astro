@@ -1,0 +1,54 @@
+---
+/**
+ * Document shell: SEO metadata, fonts and the stylesheet stack in the original order
+ * (Bootstrap → CodeMirror → site styles). The site styles must come last because some
+ * of their CodeMirror rules tie on specificity with CodeMirror's own.
+ */
+import "bootstrap/dist/css/bootstrap.min.css";
+import "codemirror/lib/codemirror.css";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="C++ STL Playground" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap"
+    />
+    <!-- Apply a saved light/dark choice before first paint (the toggle itself lives in Topbar). -->
+    <script is:inline>
+      try {
+        var t = localStorage.getItem("stl-theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {
+        /* storage blocked */
+      }
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

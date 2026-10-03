@@ -1,0 +1,45 @@
+---
+// Numeric: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import AccumulateVisualizer from "../visualizers/AccumulateVisualizer.tsx";
+import Callout from "../ui/Callout.astro";
+import CodePair from "../ui/CodePair.astro";
+import GcdVisualizer from "../visualizers/GcdVisualizer.tsx";
+import PrefixSumVisualizer from "../visualizers/PrefixSumVisualizer.tsx";
+---
+
+<Topic id="accumulate" eyebrow="Algorithm · <numeric>">
+  <Fragment slot="title"><span class="ns">std::</span>accumulate</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;numeric&gt;</code><span class="chip"><b>O(n)</b></span></div>
+  <div class="prose">
+    <p><code>accumulate(first, last, init)</code> starts at <code>init</code> and adds each element. With init 0 you get the plain sum, 16. With init 5 you get 21.</p>
+    <p>The type of <code>init</code> sets the type of the running total. Summing a <code>vector&lt;long long&gt;</code> with init <code>0</code> adds into an <code>int</code> and can overflow. Write <code>0LL</code>.</p>
+  </div>
+  <AccumulateVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="accumulate" />
+  <Callout title="Name clash">Naming your own function <code>accumulate()</code> while <code>using namespace std;</code> is active compiles here, but it is fragile and confusing to read. The snippet renames it to <code>accumulateDemo</code>.</Callout>
+</Topic>
+
+<Topic id="prefix" eyebrow="Numeric · prefix sums">
+  <Fragment slot="title"><span class="ns">std::</span>partial_sum</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;numeric&gt;</code><span class="chip">build <b>O(n)</b></span><span class="chip">range sum query <b>O(1)</b></span></div>
+  <div class="prose">
+    <p><code>partial_sum</code> writes running totals: <code>pre[i] = v[0] + … + v[i]</code>. After that, the sum of any range <code>v[l..r]</code> is <code>pre[r] - pre[l - 1]</code>, one subtraction instead of a loop.</p>
+    <p>With 100,000 queries on 100,000 numbers, a loop per query is 10¹⁰ steps. Prefix sums make it 200,000.</p>
+  </div>
+  <PrefixSumVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="prefix" />
+  <ul class="notes"><li><code>adjacent_difference</code> is the reverse: it recovers <code>v</code> from its running totals, and it is the basis of difference arrays for range updates.</li></ul>
+</Topic>
+
+<Topic id="gcd" eyebrow="Numeric · <numeric>">
+  <Fragment slot="title"><span class="ns">std::</span>gcd <span class="ns">&amp;</span> lcm</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;numeric&gt;</code><span class="chip"><b>O(log min(a,b))</b></span><span class="chip">C++17</span></div>
+  <div class="prose">
+    <p><code>gcd</code> uses Euclid's rule: gcd(a, b) = gcd(b, a % b), stopping when b is 0. 48 and 18 take three steps: 48 % 18 = 12, 18 % 12 = 6, 12 % 6 = 0.</p>
+    <p><code>lcm(a, b)</code> equals a / gcd(a, b) × b. Dividing first keeps the intermediate number small.</p>
+  </div>
+  <GcdVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="gcd" />
+  <ul class="notes"><li><code>__gcd</code> is a GCC extension from before C++17. It won't compile on MSVC. Prefer <code>std::gcd</code>.</li></ul>
+</Topic>

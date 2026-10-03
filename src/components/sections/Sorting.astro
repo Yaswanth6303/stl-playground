@@ -1,0 +1,56 @@
+---
+// Sorting: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import Callout from "../ui/Callout.astro";
+import CodePair from "../ui/CodePair.astro";
+import ComparatorVisualizer from "../visualizers/ComparatorVisualizer.tsx";
+import NthElementVisualizer from "../visualizers/NthElementVisualizer.tsx";
+import SortVisualizer from "../visualizers/SortVisualizer.tsx";
+import StableSortVisualizer from "../visualizers/StableSortVisualizer.tsx";
+---
+
+<Topic id="sort" eyebrow="Algorithm · <algorithm>">
+  <Fragment slot="title"><span class="ns">std::</span>sort</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip"><b>O(n log n)</b></span><span class="chip">range is [first, last)</span></div>
+  <div class="prose">
+    <p><code>sort(first, last)</code> sorts the half-open range: <code>first</code> is included, <code>last</code> is not. So <code>sort(nums + 1, nums + 4)</code> sorts indices 1, 2 and 3 and leaves 0 and 4 alone. The result is <code>9 1 3 4 0</code>.</p>
+    <p>For an array, <code>nums + k</code> is a pointer to index k. For a vector, use <code>vec.begin() + k</code>. Same idea.</p>
+  </div>
+  <SortVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="sort" />
+  <ul class="notes"><li>GCC's <code>std::sort</code> is introsort: quicksort that switches to heapsort if recursion gets too deep, and insertion sort for small pieces. It is not stable. Use <code>stable_sort</code> when equal elements must keep their order.</li></ul>
+</Topic>
+
+<Topic id="stable" eyebrow="Sorting · keeps ties in order">
+  <Fragment slot="title"><span class="ns">std::</span>stable_sort</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip"><b>O(n log n)</b></span><span class="chip">extra memory <b>O(n)</b></span></div>
+  <div class="prose">
+    <p>Two students both scored 90. A <b>stable</b> sort promises that whoever came first in the input still comes first in the output. <code>std::sort</code> makes no such promise and may swap them.</p>
+    <p>This matters when you sort twice: sort by name first, then <code>stable_sort</code> by marks, and students with equal marks stay alphabetical.</p>
+  </div>
+  <StableSortVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="stable" />
+</Topic>
+
+<Topic id="nth" eyebrow="Sorting · sort only what you need">
+  <Fragment slot="title"><span class="ns">std::</span>nth_element <span class="ns">&amp;</span> partial_sort</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip">nth_element <b>O(n)</b> avg</span><span class="chip">partial_sort <b>O(n log k)</b></span></div>
+  <div class="prose">
+    <p><code>nth_element(first, first + k, last)</code> puts the value that belongs at index k into index k. Everything left of it is ≤, everything right is ≥, and neither side is sorted. That is enough for a median or the k-th smallest score, and it runs in linear time.</p>
+    <p><code>partial_sort(first, first + k, last)</code> sorts only the first k positions. Use it for "top 3 scores" when fully sorting 1,000,000 values would waste time.</p>
+  </div>
+  <NthElementVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="nth" />
+</Topic>
+
+<Topic id="comparator" eyebrow="Custom ordering · sort(first, last, comp)">
+  <Fragment slot="title">comparators</Fragment>
+  <div class="chips"><span class="chip">comp(a, b) → <b>true</b> means a goes first</span><span class="chip">must be <b>strict</b></span></div>
+  <div class="prose">
+    <p>A comparator answers one question: should <code>a</code> come before <code>b</code>? <code>sort</code> calls it many times and arranges elements from the answers.</p>
+    <p><code>complexComparator</code> sorts pairs by <code>second</code> descending, and breaks ties by <code>first</code> ascending. Click any two pairs below to ask the comparator about them, then sort.</p>
+  </div>
+  <ComparatorVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="comparator" />
+  <Callout title="Never return true for equal elements" danger>A comparator written as <code>if (a &lt; b) return false; else return true;</code> returns true when <code>a == b</code>. That breaks the rule <code>sort</code> relies on (comp(a, a) must be false). With enough duplicates, <code>std::sort</code> can run past the end of the array and crash. Write <code>return a &gt; b;</code> instead.</Callout>
+</Topic>

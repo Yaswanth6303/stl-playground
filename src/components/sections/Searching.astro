@@ -1,0 +1,57 @@
+---
+// Searching: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import BinarySearchVisualizer from "../visualizers/BinarySearchVisualizer.tsx";
+import Callout from "../ui/Callout.astro";
+import CodePair from "../ui/CodePair.astro";
+import CountFindVisualizer from "../visualizers/CountFindVisualizer.tsx";
+import MinMaxVisualizer from "../visualizers/MinMaxVisualizer.tsx";
+import PredicateVisualizer from "../visualizers/PredicateVisualizer.tsx";
+---
+
+<Topic id="countfind" eyebrow="Algorithm · linear scan">
+  <Fragment slot="title"><span class="ns">std::</span>count <span class="ns">&amp;</span> find</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip"><b>O(n)</b></span></div>
+  <div class="prose">
+    <p>Both walk the range from left to right. <code>count</code> checks every element and returns how many match. <code>find</code> stops at the first match and returns an iterator to it. When nothing matches, <code>find</code> returns <code>last</code> (here <code>nums + 5</code>), so compare against that before using <code>*it</code>.</p>
+  </div>
+  <CountFindVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="countfind" />
+  <ul class="notes"><li>On a <code>set</code> or <code>map</code>, call the member <code>st.find(x)</code>. It is O(log n). <code>std::find</code> on a set still scans every element.</li></ul>
+</Topic>
+
+<Topic id="bsearch" eyebrow="Searching · sorted ranges">
+  <Fragment slot="title"><span class="ns">std::</span>binary_search</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip"><b>O(log n)</b></span><span class="chip">range must be sorted</span></div>
+  <div class="prose">
+    <p>Binary search looks at the middle, throws away the half that can't contain the answer, and repeats. 1,000,000 elements need at most 20 looks.</p>
+    <p><code>binary_search</code> only answers yes or no. <code>lower_bound</code> (first ≥ x) and <code>upper_bound</code> (first &gt; x) return positions, and <code>ub - lb</code> counts how many times x appears. Step through the search below and watch <b>lo</b>, <b>mid</b> and <b>hi</b> close in.</p>
+  </div>
+  <BinarySearchVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="bsearch" />
+  <Callout title="Unsorted input" danger>On an unsorted vector these functions still run and return something. The answer is just wrong. Sort first, or keep the data in a <code>set</code>.</Callout>
+</Topic>
+
+<Topic id="pred" eyebrow="Searching · with a condition">
+  <Fragment slot="title">count_if, find_if, all_of, any_of, none_of</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip"><b>O(n)</b></span><span class="chip">takes a lambda</span></div>
+  <div class="prose">
+    <p>These take a condition instead of a value. You write the condition as a lambda: <code>[](int x) &#123; return x % 2 == 0; &#125;</code> is a small unnamed function that returns true for even numbers.</p>
+    <p><code>all_of</code>, <code>any_of</code> and <code>none_of</code> stop as soon as the answer is known. Pick a condition and run each one to see how many elements it actually checks.</p>
+  </div>
+  <PredicateVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="pred" />
+  <ul class="notes"><li><code>all_of</code> on an empty range returns true, <code>any_of</code> returns false. There is nothing to break the rule, and nothing to satisfy it.</li></ul>
+</Topic>
+
+<Topic id="minmax" eyebrow="Algorithm · <algorithm>">
+  <Fragment slot="title"><span class="ns">std::</span>max_element <span class="ns">&amp;</span> reverse</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip"><b>O(n)</b></span></div>
+  <div class="prose">
+    <p><code>max_element</code> and <code>min_element</code> return an iterator, not a value. Use <code>*it</code> for the value and <code>it - nums</code> for the index. <code>reverse</code> swaps elements from both ends toward the middle.</p>
+  </div>
+  <MinMaxVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="minmax" />
+  <ul class="notes"><li>Need both at once? <code>minmax_element</code> returns a pair of iterators in a single pass.</li>
+    <li>For a handful of plain values, <code>max(&#123;3, 9, 4&#125;)</code> takes an initializer list and returns 9. No array needed.</li></ul>
+</Topic>

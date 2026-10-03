@@ -1,0 +1,26 @@
+---
+/** "Common mistakes": wrong vs right snippets, highlighted at build time. */
+import { MISTAKES } from "../../data/mistakes";
+import { highlight } from "../../lib/highlight";
+---
+
+<div id="mistakeList">
+  {
+    MISTAKES.map(({ title, why, wrong, right }) => (
+      <div class="mistake">
+        <h4>{title}</h4>
+        <div>{why}</div>
+        <div class="fix">
+          <div>
+            <div class="lab bad">✕ wrong</div>
+            <pre><code set:html={highlight(wrong)} /></pre>
+          </div>
+          <div>
+            <div class="lab good">✓ right</div>
+            <pre><code set:html={highlight(right)} /></pre>
+          </div>
+        </div>
+      </div>
+    ))
+  }
+</div>

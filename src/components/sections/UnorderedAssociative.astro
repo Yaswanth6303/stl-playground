@@ -1,0 +1,35 @@
+---
+// Unordered (hash): content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import CodePair from "../ui/CodePair.astro";
+import UnorderedMapVisualizer from "../visualizers/UnorderedMapVisualizer.tsx";
+import UnorderedSetVisualizer from "../visualizers/UnorderedSetVisualizer.tsx";
+---
+
+<Topic id="uset" eyebrow="Unordered associative · hash table">
+  <Fragment slot="title"><span class="ns">std::</span>unordered_set</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;unordered_set&gt;</code><span class="chip">insert / find <b>O(1)</b> average</span><span class="chip">worst <b>O(n)</b></span></div>
+  <div class="prose">
+    <p>Values go into <b>buckets</b>. A hash function turns the value into a bucket number, so a lookup computes one number and checks only that bucket. No tree to walk, which makes the average cost O(1).</p>
+    <p>This model uses <code>x % 7</code> so you can predict where each value lands. GCC hashes an int to itself and then takes <code>value % bucket_count</code>, so the idea matches. Because buckets follow the hash, iteration order looks random, and there is no <code>lower_bound</code>.</p>
+  </div>
+  <UnorderedSetVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="uset" />
+  <ul class="notes">
+    <li>Worst case: when many values land in one bucket, lookups scan a long chain. Try inserting 7, 14, 21, 28 to see a single bucket fill up.</li>
+    <li>Iteration order differs between compilers. Never rely on it.</li>
+    <li><code>unordered_multiset</code> and <code>unordered_multimap</code> exist too: same buckets, duplicates allowed.</li>
+  </ul>
+</Topic>
+
+<Topic id="umap" eyebrow="Unordered associative · hash table">
+  <Fragment slot="title"><span class="ns">std::</span>unordered_map</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;unordered_map&gt;</code><span class="chip">[] / find <b>O(1)</b> average</span><span class="chip">worst <b>O(n)</b></span></div>
+  <div class="prose">
+    <p>A map built on a hash table. The key decides the bucket, the value rides along. You get the same <code>[]</code>, <code>insert</code>, <code>find</code> and <code>count</code> as <code>map</code>, faster on average, with no ordering. This model hashes the key with <code>key % 5</code>.</p>
+    <p>The output of the example came out as 4, 3, 2, 1 on g++ 13.3. Another compiler can print a different order.</p>
+  </div>
+  <UnorderedMapVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="umap" />
+  <ul class="notes"><li>Use <code>map</code> when you need keys in order or range queries. Use <code>unordered_map</code> for plain lookups like frequency counts. <code>pair</code> keys don't have a default hash, so <code>unordered_map&lt;pair&lt;int,int&gt;, int&gt;</code> needs a custom hash.</li></ul>
+</Topic>

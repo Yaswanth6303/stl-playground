@@ -1,0 +1,65 @@
+---
+// Ordered associative: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import Callout from "../ui/Callout.astro";
+import CodePair from "../ui/CodePair.astro";
+import MapVisualizer from "../visualizers/MapVisualizer.tsx";
+import MultimapVisualizer from "../visualizers/MultimapVisualizer.tsx";
+import MultisetVisualizer from "../visualizers/MultisetVisualizer.tsx";
+import SetVisualizer from "../visualizers/SetVisualizer.tsx";
+---
+
+<Topic id="set" eyebrow="Ordered associative · red-black tree">
+  <Fragment slot="title"><span class="ns">std::</span>set</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;set&gt;</code><span class="chip">insert / erase / find <b>O(log n)</b></span><span class="chip">unique + sorted</span></div>
+  <div class="prose">
+    <p>A set keeps unique values in ascending order. Insert 12 twice and the second insert is ignored. Internally it is a balanced binary tree, so each operation walks one path from root to leaf: about 20 steps for a million elements.</p>
+    <p><code>lower_bound(x)</code> returns the first element <b>≥ x</b>. <code>upper_bound(x)</code> returns the first element <b>&gt; x</b>. If nothing qualifies you get <code>end()</code>. Try 11, 12 and 214 below.</p>
+  </div>
+  <SetVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="set" />
+  <Callout title="Check before *" danger><code>upper_bound(214)</code> on this set returns <code>end()</code>. Printing <code>*ub</code> before checking <code>ub == st.end()</code> reads past the tree: undefined behavior. The fixed code checks first.</Callout>
+  <ul class="notes">
+    <li>Use the member <code>st.lower_bound(x)</code>, not <code>std::lower_bound(st.begin(), st.end(), x)</code>. The free function is O(n) on a set because set iterators can't jump.</li>
+    <li><code>erase(it1, it2)</code> removes the half-open range: <code>it1</code> is removed, <code>it2</code> is kept.</li>
+  </ul>
+</Topic>
+
+<Topic id="multiset" eyebrow="Ordered associative · duplicates allowed">
+  <Fragment slot="title"><span class="ns">std::</span>multiset</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;set&gt;</code><span class="chip">insert / find <b>O(log n)</b></span><span class="chip">count <b>O(log n + k)</b></span></div>
+  <div class="prose">
+    <p>Same as set, but duplicates stay. Values are still sorted, and equal values sit next to each other.</p>
+    <p>The trap is <code>erase</code>. <code>ms.erase(2)</code> with a value removes <b>every</b> 2. <code>ms.erase(ms.find(2))</code> with an iterator removes <b>one</b>. Try both.</p>
+  </div>
+  <MultisetVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="multiset" />
+  <ul class="notes"><li>A multiset works as a sorted bag for "sliding window median" or "remove one copy of the largest" problems: <code>ms.erase(prev(ms.end()))</code>.</li></ul>
+</Topic>
+
+<Topic id="map" eyebrow="Ordered associative · key → value">
+  <Fragment slot="title"><span class="ns">std::</span>map</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;map&gt;</code><span class="chip">[] / insert / find <b>O(log n)</b></span><span class="chip">sorted by key</span></div>
+  <div class="prose">
+    <p>A map stores key-value pairs with unique keys, sorted by key. It is the same tree as a set, with a value attached to each key.</p>
+    <p>Three behaviors catch people out, and all three are buttons below. <code>mpp[k] = v</code> overwrites an existing value. <code>mpp.insert(&#123;k, v&#125;)</code> does <b>not</b> overwrite when the key exists. Reading <code>mpp[k]</code> for a missing key <b>creates</b> it with an empty value.</p>
+  </div>
+  <MapVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="map" />
+  <ul class="notes">
+    <li>To check for a key without creating it, use <code>mpp.count(k)</code>, <code>mpp.find(k) != mpp.end()</code>, or <code>mpp.contains(k)</code> in C++20.</li>
+    <li>Counting words: <code>freq[word]++</code> works because a missing key starts at 0.</li>
+  </ul>
+</Topic>
+
+<Topic id="multimap" eyebrow="Ordered associative · duplicate keys">
+  <Fragment slot="title"><span class="ns">std::</span>multimap</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;map&gt;</code><span class="chip">insert <b>O(log n)</b></span><span class="chip">equal_range <b>O(log n)</b></span><span class="chip">no [] operator</span></div>
+  <div class="prose">
+    <p>A multimap allows the same key many times. Entries are sorted by key only. Entries with equal keys keep the order you inserted them, which is why the output shows <code>1 -&gt; a</code>, <code>1 -&gt; b</code>, <code>1 -&gt; a</code>.</p>
+    <p><code>equal_range(k)</code> returns a pair of iterators. <code>first</code> points at the first entry with key k. <code>second</code> points one past the last one. Loop from first while <code>i != second</code>.</p>
+  </div>
+  <MultimapVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="multimap" />
+  <ul class="notes"><li>A multimap has no <code>[]</code>: with several values per key, <code>mm[2]</code> would be ambiguous.</li></ul>
+</Topic>

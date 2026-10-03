@@ -1,0 +1,69 @@
+---
+// Modifying: content carried over verbatim from STL-Playground.html.
+import Topic from "../ui/Topic.astro";
+import CodePair from "../ui/CodePair.astro";
+import FillIotaVisualizer from "../visualizers/FillIotaVisualizer.tsx";
+import PermutationVisualizer from "../visualizers/PermutationVisualizer.tsx";
+import RotateVisualizer from "../visualizers/RotateVisualizer.tsx";
+import TransformVisualizer from "../visualizers/TransformVisualizer.tsx";
+import UniqueVisualizer from "../visualizers/UniqueVisualizer.tsx";
+---
+
+<Topic id="rotate" eyebrow="Modifying · shift with wrap-around">
+  <Fragment slot="title"><span class="ns">std::</span>rotate</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip"><b>O(n)</b></span></div>
+  <div class="prose">
+    <p><code>rotate(first, middle, last)</code> moves <code>middle</code> to the front and wraps the earlier elements to the back. <code>rotate(v.begin(), v.begin() + 2, v.end())</code> turns <code>1 2 3 4 5 6</code> into <code>3 4 5 6 1 2</code>: a left rotation by 2.</p>
+    <p>For a right rotation, use reverse iterators: <code>rotate(v.rbegin(), v.rbegin() + k, v.rend())</code>.</p>
+  </div>
+  <RotateVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="rotate" />
+  <ul class="notes"><li>If k can be larger than the size, use <code>k % v.size()</code> first. <code>v.begin() + 8</code> on 6 elements is out of range.</li></ul>
+</Topic>
+
+<Topic id="unique" eyebrow="Modifying · remove adjacent duplicates">
+  <Fragment slot="title"><span class="ns">std::</span>unique</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip"><b>O(n)</b></span><span class="chip">does not change size</span></div>
+  <div class="prose">
+    <p><code>unique</code> slides each new value forward over the repeats and returns an iterator to the new logical end. It does <b>not</b> shrink the vector. The leftover tail still exists with unspecified values until you <code>erase</code> it.</p>
+    <p>It also only compares neighbours, so sort first. The full idiom is <code>sort</code>, then <code>v.erase(unique(v.begin(), v.end()), v.end())</code>.</p>
+  </div>
+  <UniqueVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="unique" />
+</Topic>
+
+<Topic id="filliota" eyebrow="Modifying · set many values at once">
+  <Fragment slot="title"><span class="ns">std::</span>fill <span class="ns">&amp;</span> iota</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><code class="chip inc">#include &lt;numeric&gt;</code><span class="chip"><b>O(n)</b></span></div>
+  <div class="prose">
+    <p><code>fill(first, last, value)</code> writes the same value into every slot of the range. It is the standard way to reset a DP table to -1.</p>
+    <p><code>iota(first, last, start)</code> writes start, start + 1, start + 2 and so on. Use it to build the index list <code>0 1 2 … n-1</code> that you then sort by some key.</p>
+  </div>
+  <FillIotaVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="filliota" />
+  <ul class="notes"><li><code>memset(dp, -1, sizeof dp)</code> works for -1 and 0 only, because it sets bytes. <code>fill</code> works for any value.</li></ul>
+</Topic>
+
+<Topic id="transform" eyebrow="Modifying · apply a function to every element">
+  <Fragment slot="title"><span class="ns">std::</span>transform <span class="ns">&amp;</span> for_each</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip"><b>O(n)</b></span></div>
+  <div class="prose">
+    <p><code>transform</code> reads each input element, calls your function, and writes the result to an output range. The output can be a different vector or the same one.</p>
+    <p><code>for_each</code> just calls your function on each element. To change the elements, the lambda must take a reference: <code>[](int &amp;x) &#123; x *= 10; &#125;</code>. Without the <code>&amp;</code> it changes a copy and the vector stays the same.</p>
+  </div>
+  <TransformVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="transform" />
+  <ul class="notes"><li>The output range must already have room. <code>vector&lt;int&gt; sq(v.size())</code> makes that room; an empty vector plus <code>back_inserter(sq)</code> also works.</li></ul>
+</Topic>
+
+<Topic id="perm" eyebrow="Algorithm · lexicographic order">
+  <Fragment slot="title"><span class="ns">std::</span>next_permutation</Fragment>
+  <div class="chips"><code class="chip inc">#include &lt;algorithm&gt;</code><span class="chip">one step <b>O(n)</b></span><span class="chip">all <b>n!</b> orders</span></div>
+  <div class="prose">
+    <p><code>next_permutation</code> rearranges the range into the next larger order, the way words follow each other in a dictionary. It returns <code>false</code> after the largest order (<code>cba</code>) and resets the range to the smallest (<code>abc</code>). That is why the <code>do &#123; &#125; while</code> loop prints each permutation once.</p>
+    <p>Start sorted or you miss some: starting from <code>bca</code> prints only <code>bca cab cba</code>. <code>prev_permutation</code> walks backwards, so start it from descending order.</p>
+  </div>
+  <PermutationVisualizer client:visible={{ rootMargin: "200px" }} />
+  <CodePair snip="perm" />
+  <ul class="notes"><li>3 letters give 6 orders. 10 letters give 3,628,800. Brute force over permutations only works for small n, around 10 or less.</li></ul>
+</Topic>
