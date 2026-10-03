@@ -29,7 +29,6 @@
 ---
 
 Interactive, animated guide to the C++ Standard Template Library, built with Astro, React islands, Three.js and Bootstrap 5.
-This is a migration of the original single-file `STL-Playground.html`. The UI, content and behavior are unchanged.
 
 ## What's inside
 
