@@ -1,0 +1,14 @@
+{
+  "entries": {
+    "cmd-1791049675331": {
+      "key": "cmd-1791049675331",
+      "value": "{\"command\":\"cd /Users/yaswanthgudivada/Developer/Projects/Codes/stl-playground/public && S=\\\"/private/tmp/claude-501/-Users-yaswanthgudivada-Developer-Projects-Codes-stl-playground/ec5abfe9-c1b9-434f-b9a4-78d75667d803/scratchpad\\\"; sed 's#<style>.*</style><path#<path fill=\\\"\\\\#3050E0\\\"#' logo.svg > $S/logo-flat.svg && magick -background none -density 1200 $S/logo-flat.svg -resize 180x180 apple-touch-icon.png && magick -background none -density 1200 $S/logo-flat.svg -define icon:auto-resize=48,32,16 favicon.ico && /bin/ls -la && magick -background none -density 600 $S/logo-flat.svg -resize 128x128 $S/check.png\",\"exitCode\":0,\"success\":true}",
+      "namespace": "commands",
+      "storedAt": "2026-10-03T17:47:55.331Z",
+      "lastAccessed": "2026-10-03T17:47:55.331Z",
+      "accessCount": 0,
+      "expiresAt": "2026-11-02T17:47:55.331Z"
+    }
+  },
+  "version": "3.0.0"
+}
